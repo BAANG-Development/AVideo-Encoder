@@ -11,7 +11,7 @@ $_POST["databasePort"] = getenv("ENCODER_DB_MYSQL_PORT");
 $_POST["databaseName"] = getenv("ENCODER_DB_MYSQL_NAME");
 $_POST["databaseUser"] = getenv("ENCODER_DB_MYSQL_USER");
 $_POST["databasePass"] = getenv("ENCODER_DB_MYSQL_PASSWORD");
-$_POST["createTables"] = 1;
+$_POST["createTables"] = 2;
 
 $_POST['siteURL'] = getenv("STREAMER_URL");
 $_POST['inputUser'] = getenv("STREAMER_USER");
