@@ -4,13 +4,13 @@ if(php_sapi_name() !== 'cli'){
 }
 
 $_POST["webSiteRootURL"] = getenv("SERVER_URL");
-$_POST["systemRootPath"] = "/var/www/html/";
+$_POST["systemRootPath"] = "/var/www/html/AVideo/Encoder/";
 
-$_POST["databaseHost"] = getenv("DB_MYSQL_HOST");
-$_POST["databasePort"] = getenv("DB_MYSQL_PORT");
-$_POST["databaseName"] = getenv("DB_MYSQL_NAME");
-$_POST["databaseUser"] = getenv("DB_MYSQL_USER");
-$_POST["databasePass"] = getenv("DB_MYSQL_PASSWORD");
+$_POST["databaseHost"] = getenv("ENCODER_DB_MYSQL_HOST");
+$_POST["databasePort"] = getenv("ENCODER_DB_MYSQL_PORT");
+$_POST["databaseName"] = getenv("ENCODER_DB_MYSQL_NAME");
+$_POST["databaseUser"] = getenv("ENCODER_DB_MYSQL_USER");
+$_POST["databasePass"] = getenv("ENCODER_DB_MYSQL_PASSWORD");
 $_POST["createTables"] = 1;
 
 $_POST['siteURL'] = getenv("STREAMER_URL");
