@@ -4,7 +4,7 @@ if(php_sapi_name() !== 'cli'){
 }
 
 $_POST["webSiteRootURL"] = getenv("SERVER_URL");
-$_POST["systemRootPath"] = "/var/www/html/";
+$_POST["systemRootPath"] = "/var/www/html/AVideo/Encoder/";
 
 $_POST["databaseHost"] = getenv("DB_MYSQL_HOST");
 $_POST["databasePort"] = getenv("DB_MYSQL_PORT");
