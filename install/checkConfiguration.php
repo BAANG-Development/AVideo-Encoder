@@ -4,7 +4,7 @@ if (file_exists("../videos/configuration.php")) {
     error_log("Can not create configuration again: ".  json_encode($_SERVER));
     exit;
 }
-
+$_POST['databaseName'] = str_replace('-', '_', $_POST['databaseName']);
 require_once '../objects/functions.php';
 
 $installationVersion = "4.0";
@@ -43,6 +43,7 @@ if ($_POST['createTables'] == 2) {
         echo json_encode($obj);
     }
 }
+error_log("CheckConfiguration: createTables={$_POST['createTables']} databaseName={$_POST['databaseName']} ");
 $mysqli->select_db($_POST['databaseName']);
 
 $tablesPrefix = '';

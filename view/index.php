@@ -384,6 +384,7 @@ if (!empty($_GET['noNavbar'])) {
                                                     <option value="a">Active</option>
                                                     <option value="i">Inactive</option>
                                                     <option value="u">Unlisted</option>
+                                                    <option value="s">Unlisted but Searchable</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -607,7 +608,7 @@ if (!empty($_GET['noNavbar'])) {
                                                 <th data-column-id="title" data-formatter="title">Title</th>
                                                 <th data-column-id="status" data-formatter="status">Status</th>
                                                 <th data-column-id="created" data-formatter="dates"  data-order="desc">Dates</th>
-                                                <th data-column-id="commands" data-formatter="commands" data-sortable="false"  data-width="100px"></th>
+                                                <th data-column-id="commands" data-formatter="commands" data-sortable="false"  data-width="120px"></th>
                                             </tr>
                                         </thead>
                                     </table>
@@ -820,6 +821,7 @@ if (!empty($_GET['noNavbar'])) {
                                             "inputAutoWebm": $('#inputAutoWebm').is(":checked"),
                                             "inputAutoAudio": $('#inputAutoAudio').is(":checked"),
                                             "categories_id": $('#bulk_categories_id').val(),
+                                            "releaseDate": $('#bulk_releaseDate').val(),
                                             "callback": $('#callback').val(),
                                             "usergroups_id": $(".usergroups_id:checked").map(function () {
                                                 return $(this).val();
@@ -1187,6 +1189,7 @@ if (!empty($_GET['noNavbar'])) {
                                                         "inputAutoWebm": $('#inputAutoWebm').is(":checked"),
                                                         "inputAutoAudio": $('#inputAutoAudio').is(":checked"),
                                                         "categories_id": $('#download_categories_id').val(),
+                                                        "releaseDate": $('#download_releaseDate').val(),
                                                         "callback": $('#callback').val(),
                                                         "usergroups_id": $(".usergroups_id:checked").map(function () {
                                                             return $(this).val();
@@ -1238,6 +1241,7 @@ if (!empty($_GET['noNavbar'])) {
                                     "inputAutoWebm": $('#inputAutoWebm').is(":checked"),
                                     "inputAutoAudio": $('#inputAutoAudio').is(":checked"),
                                     "categories_id": $('#download_categories_id').val(),
+                                    "releaseDate": $('#download_releaseDate').val(),
                                     "callback": $('#callback').val(),
                                     "usergroups_id": $(".usergroups_id:checked").map(function () {
                                         return $(this).val();
