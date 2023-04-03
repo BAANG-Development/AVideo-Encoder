@@ -471,29 +471,6 @@ function parseSecondsToDuration($seconds) {
     return secondsToVideoTime($seconds);
 }
 
-/**
- * 
- * @global type $global
- * @param type $mail
- * call it before send mail to let AVideo decide the method
- */
-function setSiteSendMessage(&$mail) {
-    global $global;
-    require_once $global['systemRootPath'] . 'objects/configuration.php';
-    $config = new Configuration();
-
-    if ($config->getSmtp()) {
-        $mail->IsSMTP(); // enable SMTP
-        $mail->SMTPAuth = true; // authentication enabled
-        $mail->SMTPSecure = $config->getSmtpSecure(); // secure transfer enabled REQUIRED for Gmail
-        $mail->Host = $config->getSmtpHost();
-        $mail->Port = $config->getSmtpPort();
-        $mail->Username = $config->getSmtpUsername();
-        $mail->Password = $config->getSmtpPassword();
-    } else {
-        $mail->isSendmail();
-    }
-}
 
 function decideFromPlugin() {
     $advancedCustom = getAdvancedCustomizedObjectData();
@@ -693,9 +670,9 @@ function ip_is_private($ip) {
 
 /**
  * webservice to use the streamer to encode the password
- * @param type $password
- * @param type $streamerURL
- * @return type
+ * @param String $password
+ * @param String $streamerURL
+ * @return String
  */
 function encryptPassword($password, $streamerURL) {
     $url = "{$streamerURL}objects/encryptPass.json.php?pass=" . urlencode($password);
@@ -925,7 +902,7 @@ function _session_start(Array $options = array()) {
             return session_start($options);
         }
     } catch (Exception $exc) {
-        _error_log("_session_start: " . $exc->getTraceAsString());
+        error_log("_session_start: " . $exc->getTraceAsString());
         return false;
     }
 }
@@ -1033,8 +1010,22 @@ function getPHP() {
     return "php";
 }
 
-function __($msg) {
-    return $msg;
+//function __($msg) {
+//    return $msg;
+//}
+function __($msg, $allowHTML = false) {
+    global $t;
+    if (empty($t[$msg])) {
+        if ($allowHTML) {
+            return $msg;
+        }
+        return str_replace(array("'", '"', "<", '>'), array('&apos;', '&quot;', '&lt;', '&gt;'), $msg);
+    } else {
+        if ($allowHTML) {
+            return $t[$msg];
+        }
+        return str_replace(array("'", '"', "<", '>'), array('&apos;', '&quot;', '&lt;', '&gt;'), $t[$msg]);
+    }
 }
 
 function getAdvancedCustomizedObjectData() {
@@ -1134,16 +1125,38 @@ function addPrefixIntoQuery($query, $tablesPrefix) {
 function isURLaVODVideo($url) {
     $parts = explode('?', $url);
     if (preg_match('/m3u8?$/i', $parts[0])) {
-        $content = url_get_contents($url);
+        $content = file_get_contents($url);
         if (empty($content)) {
-            return false;
+            return false; // Can't determine if the video is VOD or live, as the content is empty
         }
-        if (!preg_match('/#EXT-X-ENDLIST/i', $content)) {
-            return false;
+
+        // If the main playlist has an ENDLIST tag, it's a VOD
+        if (preg_match('/#EXT-X-ENDLIST/i', $content) || 
+        preg_match('/#EXT-X-PLAYLIST-TYPE:\s*VOD/i', $content) || 
+        preg_match('/URI=".+enc_[0-9a-z]+.key/i', $content)) {
+            return true; // VOD content
         }
+
+        // Check for variant playlist URL in the main playlist
+        $pattern = '/#EXT-X-STREAM-INF:.*BANDWIDTH=\d+.*\n(.+index\.m3u8)/i';
+        if (preg_match_all($pattern, $content, $matches)) {
+            $resURL = $matches[1][0];
+            if (!empty($resURL)) {
+                $urlComponents = parse_url($url);
+                $pathComponents = explode('/', $urlComponents['path']);
+                array_pop($pathComponents); // Remove the last path component (the main playlist file)
+                $pathComponents[] = $resURL; // Append the resolution-specific playlist file
+                $urlComponents['path'] = implode('/', $pathComponents);
+
+                $newURL = $urlComponents['scheme'] . '://' . $urlComponents['host'] . $urlComponents['path'];
+                return isURLaVODVideo($newURL);
+            }
+        }
+        return false; // The provided URL is not a valid m3u8 file or the video is live
     }
     return true;
 }
+
 
 function _utf8_encode($string) {
     global $global;
@@ -1156,11 +1169,11 @@ function _utf8_encode($string) {
 
 function _rename($originalFile, $newName) {
     // Attempt to rename the file
-    if (rename($originalFile, $newName)) {
+    if (@rename($originalFile, $newName)) {
         return true;
     } else {
         // Rename failed, try to copy and delete
-        if (copy($originalFile, $newName) && unlink($originalFile)) {
+        if (copy($originalFile, $newName) && @unlink($originalFile)) {
             return true;
         }
     }

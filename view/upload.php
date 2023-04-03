@@ -1,5 +1,7 @@
 <?php
-
+if(empty($global)){
+    $global=[];
+}
 if (empty($global['systemRootPath'])) {
     require_once dirname(__FILE__) . '/../videos/configuration.php';
     require_once '../objects/Encoder.php';
@@ -33,12 +35,12 @@ if (isset($_FILES['upl']) && $_FILES['upl']['error'] == 0) {
     $destinationFileURI = "{$global['webSiteRootURL']}videos/original_" . $filename;
     if (!empty($forceRename)) {
         if (!rename($_FILES['upl']['tmp_name'], $destinationFile)) {
-            $obj->msg = "Error on rename(" . $_FILES['upl']['tmp_name'] . ", " . "{$global['systemRootPath']}videos/original_" . $filename . ")";
+            $obj->msg = "Error on rename(" . $_FILES['upl']['tmp_name'] . ",  {$destinationFile})";
             die(json_encode($obj));
         }
     } else {
         if (!move_uploaded_file($_FILES['upl']['tmp_name'], $destinationFile)) {
-            $obj->msg = "Error on move_uploaded_file(" . $_FILES['upl']['tmp_name'] . ", " . "{$global['systemRootPath']}videos/original_" . $filename . ")";
+            $obj->msg = "Error on move_uploaded_file(" . $_FILES['upl']['tmp_name'] . ",  {$destinationFile})";
             die(json_encode($obj));
         }
     }
@@ -55,7 +57,7 @@ if (isset($_FILES['upl']) && $_FILES['upl']['error'] == 0) {
         $e->setTitle($path_parts['filename']);
         $e->setFileURI($destinationFileURI);
         $e->setFilename($filename);
-        $e->setStatus('queue');
+        $e->setStatus(Encoder::$STATUS_QUEUE);
         $e->setPriority($s->getPriority());
         //$e->setNotifyURL($global['AVideoURL'] . "aVideoEncoder.json");
         //error_log("Upload.php will set format");
@@ -100,17 +102,17 @@ if (isset($_FILES['upl']) && $_FILES['upl']['error'] == 0) {
         $obj->video_id_hash = '';
         $f = new Format($e->getFormats_id());
         $format = $f->getExtension();
-        
-        if (!empty($_POST['update_video_id'])){
+
+        if (!empty($_POST['update_video_id'])) {
             $obj->videos_id = $_POST['update_video_id'];
-        }else{
+        } else {
             $obj->videos_id = 0;
         }
-        
+
         $obj->releaseDate = @$_REQUEST['releaseDate'];
 
         // This raises an harmless error
-        error_log("Upload.php line: ".__LINE__.' '. json_encode($format));
+        error_log("Upload.php line: " . __LINE__ . ' ' . json_encode($format));
         $response = Encoder::sendFile('', $obj, $format, $e);
         if (!empty($response->response->video_id)) {
             $obj->videos_id = $response->response->video_id;
